@@ -1,0 +1,25 @@
+services:
+  api:
+    build: .
+    container_name: vlab_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    container_name: vlab_db
+    environment:
+      POSTGRES_USER: vlab
+      POSTGRES_PASSWORD: vlab
+      POSTGRES_DB: vlab
+    ports:
+      - "5432:5432"
+    volumes:
+      - vlab_pgdata:/var/lib/postgresql/data
+
+volumes:
+  vlab_pgdata:
