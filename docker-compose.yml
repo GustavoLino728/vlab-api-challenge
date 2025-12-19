@@ -2,24 +2,33 @@ services:
   api:
     build: .
     container_name: vlab_api
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     volumes:
       - .:/app
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   db:
     image: postgres:16-alpine
     container_name: vlab_db
     environment:
-      POSTGRES_USER: vlab
-      POSTGRES_PASSWORD: vlab
-      POSTGRES_DB: vlab
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - vlab_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   vlab_pgdata:
