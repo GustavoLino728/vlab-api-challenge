@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import date
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.abastecimento import Abastecimento, TipoCombustivel
 from app.repositories.abastecimento_repo import AbastecimentoRepository
@@ -17,12 +18,29 @@ class AbastecimentoService:
             return Decimal("6.20")
         
     def _is_improper(self, preco: Decimal, media: Decimal) -> bool:
-        if preco > media + (media*0.75):
-            return True
-        else:
-            return False
+        return preco > (media * Decimal("1.25"))
         
-    async def criar(self, session: AsyncSession, data: AbastecimentoCreate) -> Abastecimento:
+    async def create(self, session: AsyncSession, data: AbastecimentoCreate) -> Abastecimento:
         media = self._media_mock(data.tipo_combustivel)
         improper = self._is_improper(data.preco_por_litro, media)
         return await self.repo.create(session=session, data=data, improper_data=improper)
+
+    async def listar(
+        self,
+        session: AsyncSession,
+        *,
+        page: int,
+        size: int,
+        tipo_combustivel: str | None,
+        data: date | None,
+    ) -> tuple[int, list[Abastecimento]]:
+        return await self.repo.list_paginated(
+            session,
+            page=page,
+            size=size,
+            tipo_combustivel=tipo_combustivel,
+            data=data,
+        )
+
+    async def historico_motorista(self, session: AsyncSession, cpf: str) -> list[Abastecimento]:
+        return await self.repo.list_by_cpf(session, cpf)
