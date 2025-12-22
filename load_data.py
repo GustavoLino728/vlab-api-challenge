@@ -1,6 +1,6 @@
 import asyncio
+import os
 import random
-from datetime import datetime, timedelta
 from decimal import Decimal
 
 import httpx
@@ -9,6 +9,8 @@ from faker import Faker
 API_URL = "http://api:8000/api/v1/abastecimentos"
 NUM_REQUESTS = 100
 INTERVAL_SECONDS = 1
+
+API_KEY = os.getenv("API_KEY", "changeme")  # mesmo nome que o Settings usa
 
 fake = Faker("pt_BR")
 
@@ -30,8 +32,9 @@ def generate_abastecimento() -> dict:
 
 
 async def send_request(session: httpx.AsyncClient, data: dict):
+    headers = {"X-API-Key": API_KEY}
     try:
-        response = await session.post(API_URL, json=data)
+        response = await session.post(API_URL, json=data, headers=headers)
         if response.status_code == 201:
             print(f"Enviado: {data['cpf_motorista']} - {response.status_code}")
         else:

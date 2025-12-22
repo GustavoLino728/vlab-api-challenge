@@ -16,6 +16,8 @@ services:
   load_data:
     build: .
     command: python load_data.py
+    env_file:
+      - .env
     depends_on:
       - api
     restart: always

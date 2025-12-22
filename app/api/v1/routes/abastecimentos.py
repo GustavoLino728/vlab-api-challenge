@@ -1,6 +1,7 @@
 from datetime import date
 from fastapi import APIRouter, Depends, Query, status
 from app.api.deps import DbSession
+from app.api.security import verify_api_key
 from app.repositories.abastecimento_repo import AbastecimentoRepository
 from app.schemas.abastecimento import AbastecimentoCreate, AbastecimentoOut
 from app.schemas.pagination import Page
@@ -12,7 +13,12 @@ router = APIRouter(prefix="/abastecimentos", tags=["Abastecimentos"])
 
 service = AbastecimentoService(repo=AbastecimentoRepository())
 
-@router.post("", response_model=AbastecimentoOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=AbastecimentoOut,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_api_key)],
+)
 async def criar_abastecimento(payload: AbastecimentoCreate, db: DbSession):
     obj = await service.create(session=db, data=payload)
     return obj
