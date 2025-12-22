@@ -9,7 +9,9 @@ from app.schemas.abastecimento import AbastecimentoCreate
 
 
 class AbastecimentoRepository:
-    async def create(self, session: AsyncSession, data: AbastecimentoCreate, improper_data: bool) -> Abastecimento:
+    async def create(
+        self, session: AsyncSession, data: AbastecimentoCreate, improper_data: bool
+    ) -> Abastecimento:
         obj = Abastecimento(
             id_posto=data.id_posto,
             data_hora=data.data_hora,
@@ -40,9 +42,7 @@ class AbastecimentoRepository:
             query = query.where(Abastecimento.tipo_combustivel == tipo_combustivel)
 
         if data:
-            query = query.where(
-                func.date(Abastecimento.data_hora) == data  
-            )
+            query = query.where(func.date(Abastecimento.data_hora) == data)
 
         count_query = select(func.count()).select_from(query.subquery())
         total = (await session.execute(count_query)).scalar_one()

@@ -10,6 +10,7 @@ router = APIRouter(prefix="/motoristas", tags=["Motoristas"])
 
 service = AbastecimentoService(repo=AbastecimentoRepository())
 
+
 @router.get("/{cpf}/historico", response_model=list[AbastecimentoOut])
 async def historico_motorista(cpf: str, db: DbSession):
     digits = only_digits(cpf)

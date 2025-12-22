@@ -13,6 +13,7 @@ router = APIRouter(prefix="/abastecimentos", tags=["Abastecimentos"])
 
 service = AbastecimentoService(repo=AbastecimentoRepository())
 
+
 @router.post(
     "",
     response_model=AbastecimentoOut,
@@ -22,6 +23,7 @@ service = AbastecimentoService(repo=AbastecimentoRepository())
 async def criar_abastecimento(payload: AbastecimentoCreate, db: DbSession):
     obj = await service.create(session=db, data=payload)
     return obj
+
 
 @router.get("", response_model=Page[AbastecimentoOut])
 async def listar_abastecimentos(
